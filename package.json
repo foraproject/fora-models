@@ -10,7 +10,7 @@
     "main": "lib",
     "dependencies": {
         "mongodb": "*",
-        "thunkify": "*",
+        "thunkify": "*"
     },
     "devDependencies": {},
     "engines": { "node": ">= 0.11.9" },
