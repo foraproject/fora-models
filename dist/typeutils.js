@@ -111,6 +111,9 @@
     };
 
     TypeUtils.prototype.getTypeDefinitions = function() {
+      if (!TypeUtils.typeCache) {
+        throw new Error("TypeUtils was not initialized before calling getTypeDefinitions()");
+      }
       return TypeUtils.typeCache;
     };
 

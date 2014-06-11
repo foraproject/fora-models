@@ -78,6 +78,8 @@ class TypeUtils
 
 
     getTypeDefinitions: =>
+        if not TypeUtils.typeCache
+            throw new Error "TypeUtils was not initialized before calling getTypeDefinitions()"
         TypeUtils.typeCache
 
 
