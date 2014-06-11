@@ -97,14 +97,16 @@
 
     TypeUtils.prototype.buildTypeCache = function*() {
       var def, items, modelName;
-      TypeUtils.typeCache = {};
-      if (this.getCacheItems) {
-        items = yield this.getCacheItems();
-        for (modelName in items) {
-          def = items[modelName];
-          TypeUtils.typeCache[modelName] = def;
+      if (!TypeUtils.typeCache) {
+        TypeUtils.typeCache = {};
+        if (this.getCacheItems) {
+          items = yield this.getCacheItems();
+          for (modelName in items) {
+            def = items[modelName];
+            TypeUtils.typeCache[modelName] = def;
+          }
+          return yield this.resolveReferences();
         }
-        return yield this.resolveReferences();
       }
     };
 
