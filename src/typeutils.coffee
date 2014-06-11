@@ -63,15 +63,16 @@ class TypeUtils
 
     
     buildTypeCache: =>*
-        TypeUtils.typeCache = {}
-        
-        if @getCacheItems
-            items = yield @getCacheItems()
+        if not TypeUtils.typeCache
+            TypeUtils.typeCache = {}
+            
+            if @getCacheItems
+                items = yield @getCacheItems()
 
-            for modelName, def of items
-                TypeUtils.typeCache[modelName] = def        
-        
-            yield @resolveReferences()
+                for modelName, def of items
+                    TypeUtils.typeCache[modelName] = def        
+            
+                yield @resolveReferences()
             
 
 
