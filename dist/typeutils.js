@@ -123,11 +123,11 @@
     };
 
     TypeUtils.prototype.init = function*(name) {
-      throw new Error("This method must be overridden in derived class");
+      throw new Error("init() must be overridden in derived class");
     };
 
     TypeUtils.prototype.resolveDynamicTypeDefinition = function*(name) {
-      throw new Error("This method must be overridden in derived class");
+      throw new Error("resolveDynamicTypeDefinition() method must be overridden in derived class");
     };
 
     return TypeUtils;
