@@ -15,9 +15,9 @@
 
     BaseModel.create = function*(params) {
       var actualTypeDef, obj, typeDef;
-      typeDef = yield this.getTypeDefinition();
+      typeDef = yield* this.getTypeDefinition();
       if (typeDef.discriminator) {
-        actualTypeDef = yield typeDef.discriminator(params);
+        actualTypeDef = yield* typeDef.discriminator(params);
         obj = new actualTypeDef.ctor(params);
         obj.getTypeDefinition = function*() {
           return actualTypeDef;
@@ -32,7 +32,7 @@
       var typeDef;
       if (!this.__typeDefinition) {
         typeDef = typeof this.typeDefinition === "function" ? this.typeDefinition() : this.typeDefinition;
-        this.__typeDefinition = yield this.getTypeUtils().getTypeDefinition(typeDef.name);
+        this.__typeDefinition = yield* this.getTypeUtils().getTypeDefinition(typeDef.name);
         if (!this.__typeDefinition) {
           throw new Error("CANNOT_RESOLVE_TYPE_DEFINITION");
         }
@@ -55,23 +55,23 @@
     BaseModel.prototype.validate = function*(typeDefinition) {
       var validator;
       if (typeDefinition == null) {
-        typeDefinition = yield this.getTypeDefinition();
+        typeDefinition = yield* this.getTypeDefinition();
       }
       validator = new Validator(this.constructor.getTypeUtils());
-      return yield validator.validate(this, typeDefinition);
+      return yield* validator.validate(this, typeDefinition);
     };
 
     BaseModel.prototype.validateField = function*(value, fieldName, typeDefinition) {
       var validator;
       if (typeDefinition == null) {
-        typeDefinition = yield this.getTypeDefinition();
+        typeDefinition = yield* this.getTypeDefinition();
       }
       validator = new Validator(this.constructor.getTypeUtils());
-      return yield validator.validateField(this, value, fieldName, typeDefinition);
+      return yield* validator.validateField(this, value, fieldName, typeDefinition);
     };
 
     BaseModel.prototype.getTypeDefinition = function*() {
-      return yield this.constructor.getTypeDefinition();
+      return yield* this.constructor.getTypeDefinition();
     };
 
     BaseModel.prototype.toJSON = function() {

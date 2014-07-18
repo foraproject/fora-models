@@ -5,7 +5,7 @@
 
   Mongo = require('mongodb');
 
-  thunkify = require('thunkify');
+  thunkify = require('fora-node-thunkify');
 
   Database = (function() {
     function Database(conf, typeDefinitions) {
@@ -36,43 +36,43 @@
     }
 
     Database.prototype.getDb = function*() {
-      return yield this.db.getDb();
+      return yield* this.db.getDb();
     };
 
     Database.prototype.insert = function*(typeDefinition, document) {
-      return yield this.db.insert(typeDefinition, document);
+      return yield* this.db.insert(typeDefinition, document);
     };
 
     Database.prototype.update = function*(typeDefinition, query, document) {
-      return yield this.db.update(typeDefinition, query, document);
+      return yield* this.db.update(typeDefinition, query, document);
     };
 
     Database.prototype.updateAll = function*(typeDefinition, query, document) {
-      return yield this.db.updateAll(typeDefinition, query, document);
+      return yield* this.db.updateAll(typeDefinition, query, document);
     };
 
     Database.prototype.count = function*(typeDefinition, query) {
-      return yield this.db.count(typeDefinition, query);
+      return yield* this.db.count(typeDefinition, query);
     };
 
     Database.prototype.find = function*(typeDefinition, query, options) {
-      return yield this.db.find(typeDefinition, query, options);
+      return yield* this.db.find(typeDefinition, query, options);
     };
 
     Database.prototype.findOne = function*(typeDefinition, query, options) {
-      return yield this.db.findOne(typeDefinition, query, options);
+      return yield* this.db.findOne(typeDefinition, query, options);
     };
 
     Database.prototype.remove = function*(typeDefinition, query) {
-      return yield this.db.remove(typeDefinition, query);
+      return yield* this.db.remove(typeDefinition, query);
     };
 
     Database.prototype.deleteDatabase = function*() {
-      return yield this.db.deleteDatabase();
+      return yield* this.db.deleteDatabase();
     };
 
     Database.prototype.setupIndexes = function*() {
-      return yield this.db.setupIndexes();
+      return yield* this.db.setupIndexes();
     };
 
     Database.prototype.getRowId = function(obj) {

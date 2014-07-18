@@ -55,7 +55,7 @@
       _ref = TypeUtils.typeCache;
       for (name in _ref) {
         def = _ref[name];
-        yield this.resolveReferencesInDef(def);
+        yield* this.resolveReferencesInDef(def);
       }
     };
 
@@ -75,10 +75,10 @@
                 }
               };
               prop.typeDefinition = subTypeDef;
-              return yield _this.resolveReferencesInDef(subTypeDef);
+              return yield* _this.resolveReferencesInDef(subTypeDef);
             }
           } else if (val.$ref) {
-            return prop.typeDefinition = yield _this.getTypeDefinition(val.$ref);
+            return prop.typeDefinition = yield* _this.getTypeDefinition(val.$ref);
           }
         };
       })(this);
@@ -87,9 +87,9 @@
       for (property in _ref) {
         value = _ref[property];
         if (value.type === 'array') {
-          _results.push(yield fn(value.items, def.schema.properties[property].items));
+          _results.push(yield* fn(value.items, def.schema.properties[property].items));
         } else {
-          _results.push(yield fn(value, def.schema.properties[property]));
+          _results.push(yield* fn(value, def.schema.properties[property]));
         }
       }
       return _results;
@@ -100,12 +100,12 @@
       if (!TypeUtils.typeCache) {
         TypeUtils.typeCache = {};
         if (this.getCacheItems) {
-          items = yield this.getCacheItems();
+          items = yield* this.getCacheItems();
           for (modelName in items) {
             def = items[modelName];
             TypeUtils.typeCache[modelName] = def;
           }
-          return yield this.resolveReferences();
+          return yield* this.resolveReferences();
         }
       }
     };
@@ -122,7 +122,7 @@
       if (dynamicResolutionContext == null) {
         dynamicResolutionContext = {};
       }
-      return (_ref = (_ref1 = TypeUtils.typeCache[name]) != null ? _ref1 : dynamicResolutionContext[name]) != null ? _ref : yield this.resolveDynamicTypeDefinition(name, dynamicResolutionContext);
+      return (_ref = (_ref1 = TypeUtils.typeCache[name]) != null ? _ref1 : dynamicResolutionContext[name]) != null ? _ref : yield* this.resolveDynamicTypeDefinition(name, dynamicResolutionContext);
     };
 
     TypeUtils.prototype.init = function*(name) {

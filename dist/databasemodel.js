@@ -5,7 +5,7 @@
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  thunkify = require('thunkify');
+  thunkify = require('fora-node-thunkify');
 
   utils = require('./utils');
 
@@ -28,22 +28,22 @@
 
     DatabaseModel.get = function*(query, context, db) {
       var result, typeDefinition;
-      typeDefinition = yield this.getTypeDefinition();
-      result = yield db.findOne(typeDefinition, query);
+      typeDefinition = yield* this.getTypeDefinition();
+      result = yield* db.findOne(typeDefinition, query);
       if (result) {
-        return yield this.constructModel(result, typeDefinition, context, db);
+        return yield* this.constructModel(result, typeDefinition, context, db);
       }
     };
 
     DatabaseModel.getAll = function*(query, context, db) {
       var item, items, typeDefinition, _i, _len, _results;
-      typeDefinition = yield this.getTypeDefinition();
-      items = yield db.find(typeDefinition, query);
+      typeDefinition = yield* this.getTypeDefinition();
+      items = yield* db.find(typeDefinition, query);
       if (items.length) {
         _results = [];
         for (_i = 0, _len = items.length; _i < _len; _i++) {
           item = items[_i];
-          _results.push(yield this.constructModel(item, typeDefinition, context, db));
+          _results.push(yield* this.constructModel(item, typeDefinition, context, db));
         }
         return _results;
       } else {
@@ -53,13 +53,13 @@
 
     DatabaseModel.find = function*(query, options, context, db) {
       var item, items, typeDefinition, _i, _len, _results;
-      typeDefinition = yield this.getTypeDefinition();
-      items = yield db.find(typeDefinition, query, options);
+      typeDefinition = yield* this.getTypeDefinition();
+      items = yield* db.find(typeDefinition, query, options);
       if (items.length) {
         _results = [];
         for (_i = 0, _len = items.length; _i < _len; _i++) {
           item = items[_i];
-          _results.push(yield this.constructModel(item, typeDefinition, context, db));
+          _results.push(yield* this.constructModel(item, typeDefinition, context, db));
         }
         return _results;
       } else {
@@ -69,34 +69,34 @@
 
     DatabaseModel.findOne = function*(query, options, context, db) {
       var result, typeDefinition;
-      typeDefinition = yield this.getTypeDefinition();
-      result = yield db.findOne(typeDefinition, query, options);
+      typeDefinition = yield* this.getTypeDefinition();
+      result = yield* db.findOne(typeDefinition, query, options);
       if (result) {
-        return yield this.constructModel(result, typeDefinition, context, db);
+        return yield* this.constructModel(result, typeDefinition, context, db);
       }
     };
 
     DatabaseModel.count = function*(query, context, db) {
       var typeDefinition;
-      typeDefinition = yield this.getTypeDefinition();
-      return yield db.count(typeDefinition, query);
+      typeDefinition = yield* this.getTypeDefinition();
+      return yield* db.count(typeDefinition, query);
     };
 
     DatabaseModel.getById = function*(id, context, db) {
       var query, result, typeDefinition;
-      typeDefinition = yield this.getTypeDefinition();
+      typeDefinition = yield* this.getTypeDefinition();
       query = db.setRowId({}, id);
-      result = yield db.findOne(typeDefinition, query);
+      result = yield* db.findOne(typeDefinition, query);
       if (result) {
-        return yield this.constructModel(result, typeDefinition, context, db);
+        return yield* this.constructModel(result, typeDefinition, context, db);
       }
     };
 
     DatabaseModel.destroyAll = function*(query, db) {
       var typeDefinition;
-      typeDefinition = yield this.getTypeDefinition();
+      typeDefinition = yield* this.getTypeDefinition();
       if (typeof typeDefinition.canDestroyAll === "function" ? typeDefinition.canDestroyAll(query) : void 0) {
-        return yield db.remove(typeDefinition, query);
+        return yield* db.remove(typeDefinition, query);
       } else {
         throw new Error("Call to destroyAll must pass safety checks on query.");
       }
@@ -118,7 +118,7 @@
 
     makeResult = function*(obj, fnConstructor, typeDefinition, context, db) {
       var result;
-      result = yield fnConstructor(obj, context, db);
+      result = yield* fnConstructor(obj, context, db);
       attachSystemFields(result, context, db);
       return result;
     };
@@ -126,14 +126,14 @@
     DatabaseModel.constructModel = function*(obj, typeDefinition, context, db) {
       var clone, effectiveTypeDef, original, result;
       if (typeDefinition.discriminator) {
-        effectiveTypeDef = yield typeDefinition.discriminator(obj);
+        effectiveTypeDef = yield* typeDefinition.discriminator(obj);
       } else {
         effectiveTypeDef = typeDefinition;
       }
-      result = yield this._constructModel_impl(obj, effectiveTypeDef, context, db);
+      result = yield* this._constructModel_impl(obj, effectiveTypeDef, context, db);
       if (effectiveTypeDef.trackChanges) {
         clone = utils.deepCloneObject(obj);
-        original = yield this._constructModel_impl(clone, effectiveTypeDef, context, db);
+        original = yield* this._constructModel_impl(clone, effectiveTypeDef, context, db);
         result.getOriginalModel = function() {
           return original;
         };
@@ -149,7 +149,7 @@
         }
       }
       if (typeDefinition.initialize) {
-        yield typeDefinition.initialize(result);
+        yield* typeDefinition.initialize(result);
       }
       return result;
     };
@@ -158,11 +158,11 @@
       var fnCtor, result;
       if (typeDefinition.customConstructor) {
         fnCtor = function*(_o, _ctx, _db) {
-          return yield typeDefinition.customConstructor(_o, _ctx, _db);
+          return yield* typeDefinition.customConstructor(_o, _ctx, _db);
         };
-        return yield makeResult(obj, fnCtor, typeDefinition, context, db);
+        return yield* makeResult(obj, fnCtor, typeDefinition, context, db);
       } else {
-        result = yield this.constructModelFields(obj, typeDefinition, context, db);
+        result = yield* this.constructModelFields(obj, typeDefinition, context, db);
         fnCtor = function*(_o, _ctx, _db) {
           if (typeDefinition.ctor) {
             return new typeDefinition.ctor(_o, _ctx, _db);
@@ -170,7 +170,7 @@
             return _o;
           }
         };
-        return yield makeResult(result, fnCtor, typeDefinition, context, db);
+        return yield* makeResult(result, fnCtor, typeDefinition, context, db);
       }
     };
 
@@ -189,7 +189,7 @@
               if (def.items.typeDefinition) {
                 for (_i = 0, _len = value.length; _i < _len; _i++) {
                   item = value[_i];
-                  arr.push(yield this.constructModel(item, def.items.typeDefinition, context, db));
+                  arr.push(yield* this.constructModel(item, def.items.typeDefinition, context, db));
                 }
               } else {
                 arr = value;
@@ -202,7 +202,7 @@
         } else {
           if (def.typeDefinition) {
             if (value) {
-              result[name] = yield this.constructModel(value, def.typeDefinition, context, db);
+              result[name] = yield* this.constructModel(value, def.typeDefinition, context, db);
             }
           } else {
             result[name] = value;
@@ -239,7 +239,7 @@
         db = this.__db;
       }
       detachSystemFields(this);
-      typeDefinition = yield this.getTypeDefinition();
+      typeDefinition = yield* this.getTypeDefinition();
       if (typeDefinition.autoGenerated) {
         _ref = typeDefinition.autoGenerated;
         for (fieldName in _ref) {
@@ -255,10 +255,10 @@
           }
         }
       }
-      errors = yield this.validate();
+      errors = yield* this.validate();
       if (!errors.length) {
         if (db.getRowId(this) && (typeDefinition.concurrency === 'optimistic' || !typeDefinition.concurrency)) {
-          _item = yield this.constructor.getById(db.getRowId(this), context, db);
+          _item = yield* this.constructor.getById(db.getRowId(this), context, db);
           if (_item.__updateTimestamp !== this.__updateTimestamp) {
             throw new Error("Update timestamp mismatch. Was " + _item.__updateTimestamp + " in saved, " + this.__updateTimestamp + " in new.");
           }
@@ -273,8 +273,8 @@
             };
             db.insert('events', event);
           }
-          result = yield db.insert(typeDefinition, this);
-          result = yield this.constructor.constructModel(result, typeDefinition, context, db);
+          result = yield* db.insert(typeDefinition, this);
+          result = yield* this.constructor.constructModel(result, typeDefinition, context, db);
         } else {
           if ((_ref2 = typeDefinition.logging) != null ? _ref2.onUpdate : void 0) {
             event = {
@@ -284,7 +284,7 @@
             db.insert('events', event);
           }
           query = db.setRowId({}, db.getRowId(this));
-          yield db.update(typeDefinition, query, this);
+          yield* db.update(typeDefinition, query, this);
           attachSystemFields(this, context, db);
           result = this;
         }
@@ -314,7 +314,7 @@
       if (!context || !db) {
         throw new Error("Invalid context or db");
       }
-      typeDefinition = yield this.getTypeDefinition();
+      typeDefinition = yield* this.getTypeDefinition();
       query = db.setRowId({}, db.getRowId(this));
       return db.remove(typeDefinition, query);
     };
@@ -323,14 +323,14 @@
       var k, link, otherTypeDef, params, query, result, typeDef, typeUtils, v, _i, _j, _len, _len1, _ref, _ref1, _ref2, _ref3, _ref4;
       _ref = this.getContext(context, db), context = _ref.context, db = _ref.db;
       typeUtils = this.constructor.getTypeUtils();
-      typeDef = yield this.getTypeDefinition();
+      typeDef = yield* this.getTypeDefinition();
       link = typeDef.links[name];
-      otherTypeDef = yield typeUtils.getTypeDefinition(link.type);
+      otherTypeDef = yield* typeUtils.getTypeDefinition(link.type);
       if (link.key) {
         if (typeof link.key === 'string') {
           switch (typeDef.schema.properties[link.key].type) {
             case 'string':
-              return yield otherTypeDef.ctor.getById(this[link.key], context, db);
+              return yield* otherTypeDef.ctor.getById(this[link.key], context, db);
             case 'array':
               throw new Error("Array keys are not implemented");
           }
@@ -341,7 +341,7 @@
             _ref2 = _ref1[_i], k = _ref2.k, v = _ref2.v;
             query[v] = this[k];
           }
-          return yield otherTypeDef.ctor.get(query, context, db);
+          return yield* otherTypeDef.ctor.get(query, context, db);
         } else {
           throw new Error("Cannot parse this key");
         }
@@ -351,7 +351,7 @@
             case 'string':
               params = {};
               params["" + link.field] = db.getRowId(this);
-              result = yield otherTypeDef.ctor.getAll(params, context, db);
+              result = yield* otherTypeDef.ctor.getAll(params, context, db);
               if (link.multiplicity === "one") {
                 if (result.length) {
                   return result[0];
@@ -370,7 +370,7 @@
             _ref4 = _ref3[_j], k = _ref4.k, v = _ref4.v;
             query[k] = this[v];
           }
-          return yield otherTypeDef.ctor.get(query, context, db);
+          return yield* otherTypeDef.ctor.get(query, context, db);
         } else {
           throw new Error("Cannot parse this key");
         }

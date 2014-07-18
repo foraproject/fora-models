@@ -4,7 +4,7 @@
     MongoDb parser really doesn't need to do much, because we use a subset of the same query syntax.
     1. Make sure queries use only supported operators
     2. We do not support comparing fields with complex type. eg (of invalid): { company: { name: 'fora', location: 'india' } }
-    
+
     TODO: Warn when queries are not operating on indexes by checking typeDefinitions
  */
 
@@ -66,7 +66,7 @@
 
     /*
         http://docs.mongodb.org/manual/reference/operator/query/
-        
+    
         Comparison operators will not require further parsing, since the value is always a simple type.
         eg: { $gte: 10 }, we don't need to anything with this.
     
@@ -77,10 +77,10 @@
         $lt     Matches values that are less than the value specified in the query.
         $lte	Matches values that are less than or equal to the value specified in the query.
         $ne	    Matches all values that are not equal to the value specified in the query.
-        $nin	Matches values that do not exist in an array specified to the query.        
-        
+        $nin	Matches values that do not exist in an array specified to the query.
+    
         Logical operators need to be parsed further
-        
+    
         -------------------------------------------
         $or	    Joins query clauses with a logical OR returns all documents that match the conditions of either clause.
         $and	Joins query clauses with a logical AND returns all documents that match the conditions of both clauses.

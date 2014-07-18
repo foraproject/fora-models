@@ -5,7 +5,7 @@
 
   Mongo = require('mongodb');
 
-  thunkify = require('thunkify');
+  thunkify = require('fora-node-thunkify');
 
   Parser = require('./queryparser');
 
@@ -33,7 +33,7 @@
         client = new Mongo.Db(this.conf.name, new Mongo.Server(this.conf.host, this.conf.port, {}), {
           safe: true
         });
-        this.db = yield thunkify(client.open).call(client);
+        this.db = yield* thunkify(client.open).call(client);
         this.parser = new Parser(this.typeDefinitions, this.conf);
       }
       return this.db;
@@ -41,9 +41,9 @@
 
     MongoDb.prototype.insert = function*(typeDefinition, document) {
       var collection, db, result;
-      db = yield this.getDb();
-      collection = yield thunkify(db.collection).call(db, typeDefinition.collection);
-      result = yield thunkify(collection.insert).call(collection, document, {
+      db = yield* this.getDb();
+      collection = yield* thunkify(db.collection).call(db, typeDefinition.collection);
+      result = yield* thunkify(collection.insert).call(collection, document, {
         safe: true
       });
       return result[0];
@@ -51,10 +51,10 @@
 
     MongoDb.prototype.update = function*(typeDefinition, query, document) {
       var collection, db;
-      db = yield this.getDb();
+      db = yield* this.getDb();
       query = this.parser.parse(query, typeDefinition);
-      collection = yield thunkify(db.collection).call(db, typeDefinition.collection);
-      return yield thunkify(collection.update).call(collection, query, document, {
+      collection = yield* thunkify(db.collection).call(db, typeDefinition.collection);
+      return yield* thunkify(collection.update).call(collection, query, document, {
         safe: true,
         multi: false
       });
@@ -62,10 +62,10 @@
 
     MongoDb.prototype.updateAll = function*(typeDefinition, query, document) {
       var collection, db;
-      db = yield this.getDb();
+      db = yield* this.getDb();
       query = this.parser.parse(query, typeDefinition);
-      collection = yield thunkify(db.collection).call(db, typeDefinition.collection);
-      return yield thunkify(collection.update).call(collection, query, document, {
+      collection = yield* thunkify(db.collection).call(db, typeDefinition.collection);
+      return yield* thunkify(collection.update).call(collection, query, document, {
         safe: true,
         multi: true
       });
@@ -73,8 +73,8 @@
 
     MongoDb.prototype.count = function*(typeDefinition, query) {
       var cursor;
-      cursor = yield this.getCursor(typeDefinition, query);
-      return yield thunkify(cursor.count).call(cursor);
+      cursor = yield* this.getCursor(typeDefinition, query);
+      return yield* thunkify(cursor.count).call(cursor);
     };
 
     MongoDb.prototype.find = function*(typeDefinition, query, options) {
@@ -82,8 +82,8 @@
       if (options == null) {
         options = {};
       }
-      cursor = yield this.getCursor(typeDefinition, query, options);
-      return yield thunkify(cursor.toArray).call(cursor);
+      cursor = yield* this.getCursor(typeDefinition, query, options);
+      return yield* thunkify(cursor.toArray).call(cursor);
     };
 
     MongoDb.prototype.findOne = function*(typeDefinition, query, options) {
@@ -91,8 +91,8 @@
       if (options == null) {
         options = {};
       }
-      cursor = yield this.getCursor(typeDefinition, query, options);
-      return yield thunkify(cursor.nextObject).call(cursor);
+      cursor = yield* this.getCursor(typeDefinition, query, options);
+      return yield* thunkify(cursor.nextObject).call(cursor);
     };
 
     MongoDb.prototype.remove = function*(typeDefinition, query, options) {
@@ -100,32 +100,32 @@
       if (options == null) {
         options = {};
       }
-      db = yield this.getDb();
+      db = yield* this.getDb();
       query = this.parser.parse(query, typeDefinition);
-      collection = yield thunkify(db.collection).call(db, typeDefinition.collection);
-      return yield thunkify(collection.remove).call(collection, query, {
+      collection = yield* thunkify(db.collection).call(db, typeDefinition.collection);
+      return yield* thunkify(collection.remove).call(collection, query, {
         safe: true
       });
     };
 
     MongoDb.prototype.deleteDatabase = function*() {
       var db;
-      db = yield this.getDb();
-      return yield (thunkify(db.dropDatabase)).call(db);
+      db = yield* this.getDb();
+      return yield* (thunkify(db.dropDatabase)).call(db);
     };
 
     MongoDb.prototype.setupIndexes = function*() {
       var collection, db, index, name, typeDefinition, _i, _len, _ref, _ref1;
-      db = yield this.getDb();
+      db = yield* this.getDb();
       _ref = this.typeDefinitions;
       for (name in _ref) {
         typeDefinition = _ref[name];
         if (typeDefinition.indexes) {
-          collection = yield thunkify(db.collection).call(db, typeDefinition.collection);
+          collection = yield* thunkify(db.collection).call(db, typeDefinition.collection);
           _ref1 = typeDefinition.indexes;
           for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
             index = _ref1[_i];
-            yield thunkify(collection.ensureIndex).call(collection, index);
+            yield* thunkify(collection.ensureIndex).call(collection, index);
           }
         }
       }
@@ -148,9 +148,9 @@
       if (options == null) {
         options = {};
       }
-      db = yield this.getDb();
+      db = yield* this.getDb();
       query = this.parser.parse(query, typeDefinition);
-      collection = yield thunkify(db.collection).call(db, typeDefinition.collection);
+      collection = yield* thunkify(db.collection).call(db, typeDefinition.collection);
       cursor = collection.find(query);
       if (options.sort) {
         cursor = cursor.sort(options.sort);

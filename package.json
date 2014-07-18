@@ -1,7 +1,7 @@
 {
     "author": "Jeswin Kumar <jeswinpk@agilehead.com>",
     "name": "fora-models",
-    "version": "0.1.2",
+    "version": "0.2.0",
     "description": "Fora's Object Database Mapper.",
     "repository": {
         "type": "git",
@@ -10,7 +10,7 @@
     "main": "dist",
     "dependencies": {
         "mongodb": "*",
-        "thunkify": "*"
+        "fora-node-thunkify": "*"
     },
     "devDependencies": {},
     "engines": { "node": ">= 0.11.9" },

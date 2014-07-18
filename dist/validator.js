@@ -13,7 +13,7 @@
       _ref = typeDefinition.schema.properties;
       for (fieldName in _ref) {
         def = _ref[fieldName];
-        this.addError(errors, fieldName, yield this.validateField(obj, obj[fieldName], fieldName, def));
+        this.addError(errors, fieldName, yield* this.validateField(obj, obj[fieldName], fieldName, def));
       }
       if ((_ref1 = typeDefinition.schema.required) != null ? _ref1.length : void 0) {
         _ref2 = typeDefinition.schema.required;
@@ -25,7 +25,7 @@
         }
       }
       if (typeDefinition.validate) {
-        customValidationResults = yield typeDefinition.validate.call(obj);
+        customValidationResults = yield* typeDefinition.validate.call(obj);
         if (customValidationResults != null ? customValidationResults.length : void 0) {
           return errors.concat(customValidationResults);
         } else {
@@ -51,12 +51,12 @@
             item = value[_i];
             if (this.typeUtils.isCustomType(fieldDef.items.type)) {
               if (item.validate) {
-                errors = errors.concat(yield item.validate());
+                errors = errors.concat(yield* item.validate());
               } else if (fieldDef.items.typeDefinition) {
-                errors = errors.concat(yield this.validate(item, fieldDef.items.typeDefinition));
+                errors = errors.concat(yield* this.validate(item, fieldDef.items.typeDefinition));
               }
             } else {
-              errors = errors.concat(yield this.validateField(obj, item, "[" + fieldName + "]", fieldDef.items));
+              errors = errors.concat(yield* this.validateField(obj, item, "[" + fieldName + "]", fieldDef.items));
             }
           }
         } else {
@@ -89,9 +89,9 @@
             default:
               if (this.typeUtils.isCustomType(fieldDef.type)) {
                 if (value.validate) {
-                  errors = errors.concat(yield value.validate());
+                  errors = errors.concat(yield* value.validate());
                 } else if (fieldDef.typeDefinition) {
-                  errors = errors.concat(yield this.validate(value, fieldDef.typeDefinition));
+                  errors = errors.concat(yield* this.validate(value, fieldDef.typeDefinition));
                 }
               }
           }
