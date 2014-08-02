@@ -3,14 +3,11 @@ thunkify = require 'fora-node-thunkify'
 
 class Database
 
-    constructor: (@conf, @typeDefinitions) ->
-        if not @typeDefinitions
-            throw new Error "Pass typeDefinitions to the database backend"
-
+    constructor: (@conf) ->
         switch @conf.type
             when 'mongodb'
                 Parser = require('./backends/mongodb')
-                @db = new Parser @conf, @typeDefinitions
+                @db = new Parser @conf
                 @rowId = @conf.rowId ? '_id'
 
 

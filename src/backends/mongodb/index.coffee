@@ -3,7 +3,7 @@ thunkify = require 'fora-node-thunkify'
 Parser = require './queryparser'
 
 class MongoDb
-    constructor: (@conf, @typeDefinitions) ->
+    constructor: (@conf) ->
 
 
 
@@ -11,7 +11,7 @@ class MongoDb
         if not @db
             client = new Mongo.Db(@conf.name, new Mongo.Server(@conf.host, @conf.port, {}), { safe: true })
             @db = yield* thunkify(client.open).call client
-            @parser = new Parser @typeDefinitions, @conf
+            @parser = new Parser @conf
         @db
 
 
@@ -72,10 +72,10 @@ class MongoDb
 
 
 
-    setupIndexes: =>*
+    setupIndexes: (typeDefinitions) =>*
         db = yield* @getDb()
 
-        for name, typeDefinition of @typeDefinitions
+        for name, typeDefinition of typeDefinitions
             if typeDefinition.indexes
                 collection = yield* thunkify(db.collection).call db, typeDefinition.collection
                 for index in typeDefinition.indexes
