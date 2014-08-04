@@ -8,10 +8,9 @@
   thunkify = require('fora-node-thunkify');
 
   Database = (function() {
-    function Database(conf, typeDefinitions) {
+    function Database(conf) {
       var Parser, _ref;
       this.conf = conf;
-      this.typeDefinitions = typeDefinitions;
       this.setRowId = __bind(this.setRowId, this);
       this.getRowId = __bind(this.getRowId, this);
       this.setupIndexes = __bind(this.setupIndexes, this);
@@ -24,13 +23,10 @@
       this.update = __bind(this.update, this);
       this.insert = __bind(this.insert, this);
       this.getDb = __bind(this.getDb, this);
-      if (!this.typeDefinitions) {
-        throw new Error("Pass typeDefinitions to the database backend");
-      }
       switch (this.conf.type) {
         case 'mongodb':
           Parser = require('./backends/mongodb');
-          this.db = new Parser(this.conf, this.typeDefinitions);
+          this.db = new Parser(this.conf);
           this.rowId = (_ref = this.conf.rowId) != null ? _ref : '_id';
       }
     }

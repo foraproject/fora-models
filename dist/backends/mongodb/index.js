@@ -10,9 +10,8 @@
   Parser = require('./queryparser');
 
   MongoDb = (function() {
-    function MongoDb(conf, typeDefinitions) {
+    function MongoDb(conf) {
       this.conf = conf;
-      this.typeDefinitions = typeDefinitions;
       this.getCursor = __bind(this.getCursor, this);
       this.ObjectId = __bind(this.ObjectId, this);
       this.setupIndexes = __bind(this.setupIndexes, this);
@@ -34,7 +33,7 @@
           safe: true
         });
         this.db = yield* thunkify(client.open).call(client);
-        this.parser = new Parser(this.typeDefinitions, this.conf);
+        this.parser = new Parser(this.conf);
       }
       return this.db;
     };
@@ -114,17 +113,16 @@
       return yield* (thunkify(db.dropDatabase)).call(db);
     };
 
-    MongoDb.prototype.setupIndexes = function*() {
-      var collection, db, index, name, typeDefinition, _i, _len, _ref, _ref1;
+    MongoDb.prototype.setupIndexes = function*(typeDefinitions) {
+      var collection, db, index, name, typeDefinition, _i, _len, _ref;
       db = yield* this.getDb();
-      _ref = this.typeDefinitions;
-      for (name in _ref) {
-        typeDefinition = _ref[name];
+      for (name in typeDefinitions) {
+        typeDefinition = typeDefinitions[name];
         if (typeDefinition.indexes) {
           collection = yield* thunkify(db.collection).call(db, typeDefinition.collection);
-          _ref1 = typeDefinition.indexes;
-          for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-            index = _ref1[_i];
+          _ref = typeDefinition.indexes;
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            index = _ref[_i];
             yield* thunkify(collection.ensureIndex).call(collection, index);
           }
         }

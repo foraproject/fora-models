@@ -4,8 +4,6 @@
     MongoDb parser really doesn't need to do much, because we use a subset of the same query syntax.
     1. Make sure queries use only supported operators
     2. We do not support comparing fields with complex type. eg (of invalid): { company: { name: 'fora', location: 'india' } }
-
-    TODO: Warn when queries are not operating on indexes by checking typeDefinitions
  */
 
 (function() {
@@ -15,9 +13,8 @@
   Mongo = require('mongodb');
 
   MongoDbQueryParser = (function() {
-    function MongoDbQueryParser(typeDefinitions, conf) {
+    function MongoDbQueryParser(conf) {
       var _ref;
-      this.typeDefinitions = typeDefinitions;
       this.conf = conf;
       this.visit_OPERATOR = __bind(this.visit_OPERATOR, this);
       this.visit_FIELD = __bind(this.visit_FIELD, this);
@@ -26,7 +23,7 @@
       this.rowId = (_ref = this.conf.rowId) != null ? _ref : "_id";
     }
 
-    MongoDbQueryParser.prototype.parse = function(node, typeDefinition) {
+    MongoDbQueryParser.prototype.parse = function(node) {
       if (node == null) {
         node = {};
       }
