@@ -1,13 +1,13 @@
 {
     "author": "Jeswin Kumar <jeswinpk@agilehead.com>",
     "name": "fora-models",
-    "version": "0.9.1",
+    "version": "0.9.2",
     "description": "Fora's Object Database Mapper.",
     "repository": {
         "type": "git",
         "url": "https://github.com/jeswin/fora-models.git"
     },
-    "main": "lib",
+    "main": "lib/fora-models",
     "dependencies": {
         "mongodb": "*",
         "fora-node-thunkify": "*"
