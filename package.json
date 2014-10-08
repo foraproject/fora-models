@@ -10,7 +10,8 @@
     "main": "lib/fora-models",
     "dependencies": {
         "mongodb": "*",
-        "fora-node-thunkify": "*"
+        "fora-node-thunkify": "*",
+        "fora-data-utils": "*"
     },
     "devDependencies": {},
     "engines": { "node": ">= 0.11.9" },
