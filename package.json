@@ -1,7 +1,7 @@
 {
     "author": "Jeswin Kumar <jeswinpk@agilehead.com>",
     "name": "fora-models",
-    "version": "0.9.2",
+    "version": "0.9.10",
     "description": "Fora's Object Database Mapper.",
     "repository": {
         "type": "git",
